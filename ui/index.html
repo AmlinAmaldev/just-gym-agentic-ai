@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Just Gym</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      margin: 0;
+      height: 100vh;
+      background: linear-gradient(120deg, #0f2027, #203a43, #2c5364);
+      overflow: hidden;
+      color: white;
+    }
+
+    /* ===== FLOATING GYM ICONS ===== */
+    .floating {
+      position: absolute;
+      font-size: 40px;
+      opacity: 0.15;
+      animation: float 20s linear infinite;
+    }
+
+    @keyframes float {
+      from {
+        transform: translateY(100vh) rotate(0deg);
+      }
+      to {
+        transform: translateY(-120vh) rotate(360deg);
+      }
+    }
+
+    /* ===== MAIN LAYOUT ===== */
+    .container {
+      display: flex;
+      height: 100%;
+      position: relative;
+      z-index: 2;
+    }
+
+    .left, .right {
+      width: 50%;
+      padding: 40px;
+    }
+
+    .left {
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(10px);
+    }
+
+    .right {
+      background: rgba(255,255,255,0.05);
+      overflow-y: auto;
+    }
+
+    h1 {
+      color: #ffcc00;
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 42px;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 12px;
+      border-radius: 8px;
+      border: none;
+      font-size: 15px;
+    }
+
+    button {
+      background: #ffcc00;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    button:hover {
+      background: #ffd633;
+    }
+
+    pre {
+      white-space: pre-wrap;
+      background: rgba(0,0,0,0.6);
+      padding: 20px;
+      border-radius: 12px;
+      font-size: 15px;
+      animation: fadeIn 0.6s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateX(20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- 🔄 Floating gym items -->
+<div class="floating" style="left:5%; animation-duration:18s;">🏋️</div>
+<div class="floating" style="left:15%; animation-duration:22s;">🏋️‍♂️</div>
+<div class="floating" style="left:30%; animation-duration:25s;">🏃</div>
+<div class="floating" style="left:45%; animation-duration:20s;">🏋️</div>
+<div class="floating" style="left:60%; animation-duration:28s;">🏃‍♂️</div>
+<div class="floating" style="left:75%; animation-duration:24s;">🏋️</div>
+<div class="floating" style="left:90%; animation-duration:26s;">🏋️‍♀️</div>
+
+<!-- ===== MAIN UI ===== -->
+<div class="container">
+
+  <!-- LEFT SIDE: FORM -->
+  <div class="left">
+    <h1>JUST GYM</h1>
+
+    <input id="name" placeholder="Your Name" />
+    <input id="age" type="number" placeholder="Age" />
+    <input id="height" placeholder="Height (cm)" />
+    <input id="weight" placeholder="Weight (kg)" />
+
+    <input id="medication" placeholder="Medical condition (if any)" />
+
+    <select id="workout">
+      <option>Gym</option>
+      <option>Home</option>
+    </select>
+
+    <select id="diet">
+      <option value="false">No Diet Plan</option>
+      <option value="true">Yes, Need Diet Plan</option>
+    </select>
+
+    <button onclick="submitForm()">Generate My Plan</button>
+  </div>
+
+  <!-- RIGHT SIDE: RESPONSE -->
+  <div class="right">
+    <h2>🧠 Your Personalized Plan</h2>
+    <pre id="reply">Fill the form and click "Generate My Plan"</pre>
+  </div>
+
+</div>
+
+<script>
+async function submitForm() {
+  document.getElementById("reply").innerText = "⏳ Generating your plan...";
+
+  const profile = {
+    name: document.getElementById("name").value,
+    age: document.getElementById("age").value,
+    height: document.getElementById("height").value,
+    weight: document.getElementById("weight").value,
+    medication: document.getElementById("medication").value || "No",
+    workout_type: document.getElementById("workout").value,
+    diet_required: document.getElementById("diet").value === "true"
+  };
+
+  const res = await fetch("/submit", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(profile)
+  });
+
+  const data = await res.json();
+
+  document.getElementById("reply").innerText =
+    data.reply || ("⚠️ Error: " + data.error);
+}
+</script>
+
+</body>
+</html>
